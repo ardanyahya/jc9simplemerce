@@ -1,15 +1,53 @@
 import React, { Component } from 'react'
-import Register from './Register';
+import { Route, BrowserRouter } from 'react-router-dom'
+import cookies from 'universal-cookie'
+import { connect } from 'react-redux'
+
+import Header from './Header'
+import Register from './Register'
+import Login from './Login'
+import Home from './Home'
+import ManageProduct from './ManageProduct'
+import DetailProduct from './DetailProduct'
+import Cart from './Cart'
+
+import { keepLogin } from '../actions' 
+
+const cookie = new cookies()
 
 class App extends Component {
+
+
+    //Get data LOGIN
+    componentDidMount(){ //hanya dijalankan sekali setelah render selesai
+        //check cookie
+        const objCookie = cookie.get('userName') // bernilai {id, username}, apabila tidak ditemukan maka bernilai undefined
+
+        if(objCookie !== undefined){
+            //jika userCookie bukan undefined maka akan login ulang
+            //login
+            this.props.keepLogin(objCookie)
+        }
+    }
+
+
+
     render () {
         return (
-            <div>
-                <Register/>
-            </div>
+            <BrowserRouter>
+                <div>
+                    <Header/>
+                    <Route path="/" exact component={Home}/> {/* equal, ===  */}
+                    <Route path="/register" component={Register}/> {/* include() */}
+                    <Route path="/login" component={Login}/> {/* include() */}
+                    <Route path="/manageproduct" component={ManageProduct}/> {/* include() */}
+                    <Route path="/detailproduct/:product_id" component={DetailProduct}/>
+                    <Route path="/cart" component={Cart}/>
+                </div>
+            </BrowserRouter>
         )
     }
 
 }
 
-export default App
+export default connect (null, {keepLogin})(App)
