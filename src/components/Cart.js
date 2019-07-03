@@ -3,6 +3,9 @@ import Axios from 'axios';
 import {connect} from 'react-redux'
 import { Link } from 'react-router-dom'
 
+import Checkout from './Checkout'
+
+
 
 class Cart extends Component {
 
@@ -49,40 +52,93 @@ class Cart extends Component {
         })
     }
 
-
-
-    handleTotalQty = () => {
-        var totalQty = 0
-        var cart = this.state.cart.map(item => {
-            return {
-                qty: item.inputCart
+    // buat function, tampil checkout
+    listCheckout = () => {
+        return this.state.cart.map (item =>{
+            if(this.props.user.id == item.idUser){
+                return (
+                    <tr>
+                        <td>{item.productName}</td>
+                        <td>Rp. {item.productPrice}</td>
+                        <td>{item.inputCart}</td>
+                        <td>Rp. {item.productPrice  * item.inputCart}</td>
+                    </tr>
+                )
             }
         })
-
-
-        for( var i = 0; i < this.state.cart.length; i++){
-            totalQty += parseInt(cart[i].qty)
-        }
-
-        return (<td>{totalQty}</td>)
-
     }
 
 
-    handleTotalPrice = () => {
-        var totalPrice = 0
-        var cart = this.state.cart.map(item => {
-            return {
-                price: item.productPrice
+    // QTY terjumlah saat dibeli user
+    // fungsiTotalQty = () => {
+    //     var totalQty = 0
+    //     for( var i = 0; i < this.state.cart.length; i++){
+    //       if (this.props.user.id === this.state.cart[i].idUser){
+    //         totalQty += parseInt(this.state.cart[i].qty)
+    //       }  
+    //     }
+
+    //     return (<td>{totalQty}</td>)
+    // }
+
+
+    fungsiTotalPrice = () => {
+        var cekHarga = this.state.cart.map (item => {
+            return{
+                // price: item.qty*item.price, // Harga barang dikalikan dengan jumlah barang yg dibeli
+                productPrice: item.inputCart*item.productPrice,
+                idUser: item.idUser
             }
         })
+        var subTotalHarga = 0
 
-        for (let i = 0; i < this.state.cart.length; i++) {
-            totalPrice += parseInt(cart[i].price)
+        for (let i = 0; i < this.state.cart.length; i++){
+            if(this.props.user.id === cekHarga[i].idUser){
+                subTotalHarga += parseInt(cekHarga[i].productPrice);
+            }
+        }
+
+        return (subTotalHarga)
+    }
+
+
+   
+    
+
+    renderCheckoutList = () => {
+            return (
+                <div className='container'>
+                    <h1 className="display-4 text-center">Checkout</h1>
+                        <table className='table table-hover mb-5'>
+                        <thead>
+                            <tr>
+                                <th scope="col">NAME</th>
+                                <th scope="col">HARGA</th>
+                                <th scope="col">QUANTITY</th>
+                                <th scope="col">TOTAL HARGA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                                {this.listCheckout()}
+                            <tr>
+                                <td colSpan="3">
+                                    <center>
+                                        <b>TOTAL HARGA</b>
+                                    </center>
+                                </td>
+                                <td>Rp. {this.fungsiTotalPrice()}</td>
+                            </tr>
+                        </tbody>
+                        </table>
+                </div>
+            )
             
-        }
-        return (<td>{totalPrice}</td>)
     }
+
+
+
+
+
 
 
 
@@ -99,12 +155,12 @@ class Cart extends Component {
                     <tr>
                         <td className='text-center'>{item.idUser}</td>
                         <td className='text-center'>{item.productName}</td>
-                        <td className='text-center'>{item.productPrice}</td>
+                        <td className='text-center'>Rp. {item.productPrice}</td>
                         <td className='text-center'>{item.inputCart}</td>
                         <td className='text-center'>
                             <img src={item.inputGambar} className='' width='65px'></img>
                         </td>
-                        <td className='text-center'>{item.productPrice  * item.inputCart}</td>
+                        {/* <td className='text-center'>Rp. {item.productPrice  * item.inputCart}</td> */}
                         <td className='text-center'>
                             <button className='btn btn-outline-primary ml-2'onClick = { () => {this.deleteCart(item)}} > Delete</button>
                         </td>     
@@ -121,42 +177,32 @@ class Cart extends Component {
     }
 
 
-
     render(){
         return(
             <div className="container">
-                <div className=''>
-                    <Link to={'/'}>
-                    <button className ='btn btn-outline-primary mt-2'>Continue Shopping</button>
-                    </Link>
-                    <button className='btn btn-outline-primary mt-2 ml-2'>Checkout</button>
-                </div>
+                
                 <h1 className="display-4 text-center">Cart List</h1>
                 <table className="table table-hover mb-5">
                     <thead>
                     <tr className='text-center'>
                             <th className='text-center'>ID</th>
                             <th className='text-center'>NAME</th>                            
-                            <th className='text-center'>PRICE</th>
+                            <th className='text-center'>HARGA</th>
                             <th className='text-center'>QUANTITY</th>
                             <th className='text-center'>PICTURE</th>
-                            <th className='text-center'>TOTAL HARGA</th>
+                            {/* <th className='text-center'>TOTAL HARGA</th> */}
                             <th className='text-center'>ACTION</th>                            
                         </tr>
                     </thead>
                     <tbody>
                             {this.renderList()}
-                            <tr>
-                                <td className='text-center'>TOTAL</td>
-                                <td className='text-center'></td>
-                                <div className='text-center'>
-                                    {this.handleTotalPrice}
-                                    {this.handleTotalQty}
-                                </div>
-                            </tr>
+                            
                     </tbody>
+                            <button className ='btn btn-outline-primary mt-2'>Checkout</button>
                 </table>
+                         {this.renderCheckoutList()}
             </div>
+                   
         )
     }
 

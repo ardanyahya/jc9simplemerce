@@ -29,14 +29,14 @@ class ProductItem extends Component {
                     inputCart : qty,
                     inputGambar : src
         }).then (res => {
-            alert('sudah di input')
+            alert('Ditambah ke Cart')
             })
 
         }else {
             if(idUser === '') {
                 alert('Login terlebih dahulu')
             }else {
-                alert("Isi barang yang anda beli")
+                alert("Isi barang yang ingin anda beli")
             }
         }}
 
